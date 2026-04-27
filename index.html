@@ -92,7 +92,7 @@
   .herramientas{
     display:flex;
     gap:6px;
-    justify-content:flex-end;
+    justify-content:flex-start;
     margin:4px 0 6px;
     flex-wrap:wrap;
   }
@@ -152,7 +152,31 @@
   .tarea-texto{display:flex;align-items:flex-start;gap:4px;word-break:break-word}
   .indent{display:inline-block;width:0}
   .cod{font-family:Consolas, 'Courier New', monospace}
-  .resumen{margin-top:7px;font-size:11px;color:#333}
+  .resumen{
+    margin-top:3px;
+    font-size:11px;
+    color:#333;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    flex-wrap:wrap;
+  }
+  .btn-resumen{
+    border:none;
+    background:transparent;
+    padding:1px 2px;
+    min-height:0;
+    font-size:11px;
+    line-height:1.1;
+    box-shadow:none;
+    border-radius:0;
+    color:#111;
+  }
+  .btn-resumen strong{font-weight:bold}
+  .btn-resumen:hover{background:#e9f2ff;outline:1px solid var(--azul)}
+  .btn-resumen-activo{background:#e9f2ff!important;outline:2px solid var(--azul)}
+  .btn-resumen-vencidas{color:#ff1744;font-weight:bold}
+  .btn-resumen-vencidas.btn-resumen-activo{background:#ffe9ef!important;outline:2px solid var(--rojo)}
   .sin-resultados{text-align:center;color:#555;padding:22px!important;font-weight:bold}
   .filtro-activo{background:#e9f2ff!important;outline:2px solid var(--azul)}
   .filtro-activo-rojo{background:#ffe9ef!important;outline:2px solid var(--rojo)}
@@ -217,18 +241,18 @@
         <input id="diasFiltro" type="number" min="0" step="1" value="" title="Días restantes hasta el vencimiento">
         <strong>días</strong>
       </div>
+      <div class="herramientas">
+        <button id="btnLimpiar">Limpiar filtros</button>
+        <button id="btnJson">Copiar/Pegar JSON</button>
+        <button onclick="window.print()">Imprimir</button>
+        <button id="btnAjustes">Ajustes</button>
+      </div>
     </div>
     <div class="busqueda-box">
       <div class="bloque-titulo">BÚSQUEDA</div>
       <input id="busqueda" type="text" placeholder="">
+      <div class="resumen" id="resumen"></div>
     </div>
-  </div>
-
-  <div class="herramientas">
-    <button id="btnLimpiar">Limpiar filtros</button>
-    <button id="btnJson">Copiar/Pegar JSON</button>
-    <button onclick="window.print()">Imprimir</button>
-    <button id="btnAjustes">Ajustes</button>
   </div>
 
   <div class="json-panel" id="jsonPanel">
@@ -258,7 +282,6 @@
       <tbody id="tbody"></tbody>
     </table>
   </div>
-  <div class="resumen" id="resumen"></div>
 </div>
 
 <div class="modal-fondo" id="modalFondo">
@@ -320,7 +343,7 @@ var STORAGE_KEY='notas_tareas_limpia_v1';
 var SETTINGS_KEY='notas_tareas_ajustes_v1';
 var ajustes={modo:'2d',tema:'negro',densidad:'normal'};
 var tasks=[];
-var filters={inicio:null, vence:null, fin:null};
+var filters={inicio:null, vence:null, fin:null, resumen:null};
 var editing={mode:'new', id:null, parentId:null};
 
 var $=function(id){return document.getElementById(id)};
@@ -390,6 +413,13 @@ function matchesState(t){
   if(filters.fin==='rojo' && isFinished(t))return false;
   return true;
 }
+function matchesResumen(t){
+  if(filters.resumen==='iniciadas')return isStarted(t);
+  if(filters.resumen==='pendientes')return !isFinished(t);
+  if(filters.resumen==='finalizadas')return isFinished(t);
+  if(filters.resumen==='vencidas')return isExpired(t);
+  return true;
+}
 function textBlob(t, code){
   var s=[code,t.texto,t.inicio,t.vence,t.fin].join(' ').toLowerCase();
   (t.children||[]).forEach(function(c,i){s+=' '+textBlob(c,code+'.'+(i+1));});
@@ -406,7 +436,7 @@ function passes(t, path){
   var days=$('diasFiltro').value;
   var q=$('busqueda').value.trim().toLowerCase();
   var code=codeFor(path);
-  var stateOk=matchesState(t);
+  var stateOk=matchesState(t) && matchesResumen(t);
   var daysOk=isWithinDays(t,days);
   var textOk=!q || textBlob(t,code).indexOf(q)>=0;
   return stateOk && daysOk && textOk;
@@ -446,7 +476,15 @@ function render(){
   var pendientes=all.filter(function(t){return !isFinished(t)}).length;
   var finalizadas=all.filter(isFinished).length;
   var vencidas=all.filter(isExpired).length;
-  $('resumen').innerHTML='Total: '+all.length+' &nbsp; Visibles: '+rows.length+' &nbsp; Iniciadas: '+iniciadas+' &nbsp; Pendientes: '+pendientes+' &nbsp; Finalizadas: '+finalizadas+' &nbsp; Vencidas: <span style="color:#ff1744;font-weight:bold">'+vencidas+'</span>';
+  var activo=function(k){return filters.resumen===k?' btn-resumen-activo':''};
+  var totalActivo=filters.resumen===null?' btn-resumen-activo':'';
+  $('resumen').innerHTML=
+    '<button class="btn-resumen'+totalActivo+'" data-resumen-filter="total"><strong>Total:</strong> '+all.length+'</button>'+
+    '<button class="btn-resumen" data-resumen-filter="visibles"><strong>Visibles:</strong> '+rows.length+'</button>'+
+    '<button class="btn-resumen'+activo('iniciadas')+'" data-resumen-filter="iniciadas"><strong>Iniciadas:</strong> '+iniciadas+'</button>'+
+    '<button class="btn-resumen'+activo('pendientes')+'" data-resumen-filter="pendientes"><strong>Pendientes:</strong> '+pendientes+'</button>'+
+    '<button class="btn-resumen'+activo('finalizadas')+'" data-resumen-filter="finalizadas"><strong>Finalizadas:</strong> '+finalizadas+'</button>'+
+    '<button class="btn-resumen btn-resumen-vencidas'+activo('vencidas')+'" data-resumen-filter="vencidas"><strong>Vencidas:</strong> '+vencidas+'</button>';
 }
 function updateFilterButtons(){
   Array.prototype.forEach.call(document.querySelectorAll('[data-filter]'),function(b){
@@ -490,11 +528,23 @@ function setup(){
   load(); render();
   $('diasFiltro').addEventListener('input',render);
   $('busqueda').addEventListener('input',render);
+  $('resumen').addEventListener('click',function(e){
+    var b=e.target.closest('button[data-resumen-filter]'); if(!b)return;
+    var v=b.getAttribute('data-resumen-filter');
+    if(v==='total'){
+      $('diasFiltro').value=''; $('busqueda').value=''; filters={inicio:null,vence:null,fin:null,resumen:null};
+    }else if(v==='visibles'){
+      filters.resumen=null;
+    }else{
+      filters.resumen=(filters.resumen===v)?null:v;
+    }
+    render();
+  });
   $('btnNueva').addEventListener('click',function(){openModal('new')});
   $('mCancelar').addEventListener('click',closeModal);
   $('mGuardar').addEventListener('click',modalSave);
   $('modalFondo').addEventListener('click',function(e){if(e.target===$('modalFondo'))closeModal();});
-  $('btnLimpiar').addEventListener('click',function(){$('diasFiltro').value='';$('busqueda').value='';filters={inicio:null,vence:null,fin:null};render();});
+  $('btnLimpiar').addEventListener('click',function(){$('diasFiltro').value='';$('busqueda').value='';filters={inicio:null,vence:null,fin:null,resumen:null};render();});
   Array.prototype.forEach.call(document.querySelectorAll('[data-filter]'),function(b){
     b.addEventListener('click',function(){
       var f=b.getAttribute('data-filter'), v=b.getAttribute('data-value');
