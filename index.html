@@ -1,580 +1,161 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
 <title>Notas de Tareas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-  :root{
-    --azul:#0077ff;
-    --rojo:#ff1744;
-    --negro:#111;
-    --gris:#f5f5f5;
-    --gris2:#e9e9e9;
-    --texto:#111;
-    --tema:#111;
-    --tema-suave:#f1f1f1;
-    --fondo:#fff;
-    --panel:#fff;
-    --borde:#111;
-    --sombra:0 0 0 rgba(0,0,0,0);
-    --radio:0px;
-    --fila-hover:#f8f8f8;
-    --font-size:12px;
-    --row-height:22px;
-  }
-  body.tema-negro{--tema:#111;--tema-suave:#f1f1f1;--fondo:#fff;--panel:#fff;--borde:#111;--fila-hover:#f4f4f4}
-  body.tema-azul{--tema:#006ce0;--tema-suave:#eaf3ff;--fondo:#f8fbff;--panel:#fff;--borde:#004f9f;--fila-hover:#eef6ff}
-  body.tema-verde{--tema:#14873d;--tema-suave:#eaf8ef;--fondo:#fbfffc;--panel:#fff;--borde:#106d31;--fila-hover:#eefaf2}
-  body.tema-amarillo{--tema:#c18a00;--tema-suave:#fff7df;--fondo:#fffdf7;--panel:#fff;--borde:#8d6500;--fila-hover:#fff8e5}
-  body.tema-rojo{--tema:#d61535;--tema-suave:#fff0f3;--fondo:#fffafa;--panel:#fff;--borde:#9f1028;--fila-hover:#fff0f3}
-  body.modo-3d{--sombra:3px 3px 0 rgba(0,0,0,.28);--radio:4px}
-  body.modo-2d{--sombra:0 0 0 rgba(0,0,0,0);--radio:0px}
-  body.densidad-compacta{--font-size:11px;--row-height:19px}
-  body.densidad-normal{--font-size:12px;--row-height:22px}
-  body.densidad-grande{--font-size:14px;--row-height:27px}
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    padding:8px;
-    font-family:Arial, Helvetica, sans-serif;
-    font-size:var(--font-size);
-    background:var(--fondo);
-    color:var(--texto);
-  }
-  .app{
-    width:100%;
-    max-width:1180px;
-    margin:0 auto;
-  }
-  .barra-superior{
-    display:grid;
-    grid-template-columns: 320px 1fr;
-    gap:18px;
-    align-items:end;
-    margin-bottom:6px;
-  }
-  .bloque-titulo{
-    font-weight:bold;
-    margin-bottom:3px;
-  }
-  .filtro-dias-linea{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    flex-wrap:nowrap;
-  }
-  .filtro-dias-label{
-    font-weight:bold;
-    line-height:1.1;
-    white-space:nowrap;
-  }
-  #diasFiltro{
-    width:44px;
-    height:24px;
-    border:2px solid var(--borde);
-    text-align:center;
-    font-weight:bold;
-    background:var(--panel);
-    border-radius:var(--radio);
-    box-shadow:var(--sombra);
-  }
-  .busqueda-box input{
-    width:100%;
-    height:22px;
-    border:2px solid var(--borde);
-    padding:2px 6px;
-    font-size:var(--font-size);
-    background:var(--panel);
-    border-radius:var(--radio);
-    box-shadow:var(--sombra);
-  }
-  .herramientas{
-    display:flex;
-    gap:6px;
-    justify-content:flex-start;
-    margin:4px 0 6px;
-    flex-wrap:wrap;
-  }
-  button{
-    border:1px solid var(--borde);
-    background:var(--panel);
-    color:#111;
-    cursor:pointer;
-    font-size:var(--font-size);
-    line-height:1;
-    padding:4px 6px;
-    min-height:22px;
-    border-radius:var(--radio);
-    box-shadow:var(--sombra);
-  }
-  button:hover{background:var(--tema-suave)}
-  body.modo-3d button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 rgba(0,0,0,.25)}
-  .btn-mini{
-    border:none;
-    background:transparent;
-    padding:0 2px;
-    min-height:0;
-    font-size:17px;
-    font-weight:bold;
-    vertical-align:middle;
-    box-shadow:none;
-    border-radius:0;
-  }
-  .btn-azul{color:var(--azul)}
-  .btn-rojo{color:var(--rojo)}
-  .btn-add{color:#111;font-size:18px}
-  .btn-edit{font-size:15px}
-  .btn-del{color:var(--rojo);font-size:15px}
-  .btn-sub{color:var(--azul);font-size:16px}
-  .tabla-wrap{border:2px solid var(--borde); overflow:auto; width:100%; background:var(--panel); border-radius:var(--radio); box-shadow:var(--sombra)}
-  table{border-collapse:collapse;width:100%;min-width:850px;table-layout:fixed}
-  thead th{
-    border-bottom:2px solid var(--borde);
-    background:var(--tema-suave);
-    height:27px;
-    font-weight:bold;
-    text-align:left;
-    padding:2px 4px;
-    white-space:nowrap;
-  }
-  tbody td{
-    padding:2px 4px;
-    height:var(--row-height);
-    vertical-align:top;
-    border-bottom:1px solid transparent;
-  }
-  tbody tr:hover{background:var(--fila-hover)}
-  .col-inicio{width:105px}.col-vence{width:105px}.col-fin{width:105px}.col-cod{width:80px}.col-mas{width:34px;text-align:center}.col-estado{width:120px}.col-acciones{width:130px;text-align:right}.col-tarea{width:auto}
-  .fecha-vacia{color:#999}
-  .estado-pill{font-size:11px;white-space:nowrap}
-  .estado-ok{color:#087c25}.estado-alerta{color:#d9002b}.estado-pend{color:#9a6200}
-  .tarea-texto{display:flex;align-items:flex-start;gap:4px;word-break:break-word}
-  .indent{display:inline-block;width:0}
-  .cod{font-family:Consolas, 'Courier New', monospace}
-  .resumen{
-    margin-top:3px;
-    font-size:11px;
-    color:#333;
-    display:flex;
-    align-items:center;
-    gap:5px;
-    flex-wrap:wrap;
-  }
-  .btn-resumen{
-    border:none;
-    background:transparent;
-    padding:1px 2px;
-    min-height:0;
-    font-size:11px;
-    line-height:1.1;
-    box-shadow:none;
-    border-radius:0;
-    color:#111;
-  }
-  .btn-resumen strong{font-weight:bold}
-  .btn-resumen:hover{background:#e9f2ff;outline:1px solid var(--azul)}
-  .btn-resumen-activo{background:#e9f2ff!important;outline:2px solid var(--azul)}
-  .btn-resumen-vencidas{color:#ff1744;font-weight:bold}
-  .btn-resumen-vencidas.btn-resumen-activo{background:#ffe9ef!important;outline:2px solid var(--rojo)}
-  .sin-resultados{text-align:center;color:#555;padding:22px!important;font-weight:bold}
-  .filtro-activo{background:#e9f2ff!important;outline:2px solid var(--azul)}
-  .filtro-activo-rojo{background:#ffe9ef!important;outline:2px solid var(--rojo)}
-  .modal-fondo{
-    display:none; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:10; align-items:center; justify-content:center; padding:12px;
-  }
-  .modal{
-    background:var(--panel); border:2px solid var(--borde); padding:12px; width:100%; max-width:430px; box-shadow:0 8px 24px rgba(0,0,0,.35);
-  }
-  .modal h2{font-size:16px;margin:0 0 10px}
-  .campo{margin-bottom:8px}
-  .campo label{display:block;font-weight:bold;margin-bottom:2px}
-  .campo input,.campo textarea{width:100%;border:2px solid var(--borde);padding:5px;font-size:13px;font-family:Arial, Helvetica, sans-serif}
-  .campo textarea{height:65px;resize:vertical}
-  .modal-botones{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
-  .json-panel{display:none;margin-top:8px;border:2px solid var(--borde);padding:8px;background:var(--panel);border-radius:var(--radio);box-shadow:var(--sombra)}
-  .json-panel textarea{width:100%;height:90px;border:2px solid var(--borde);font-family:Consolas,'Courier New',monospace;font-size:11px;padding:5px}
+:root{--accent:#007bff;--accent-dark:#0056b3;--bg:#f4f6f8;--panel:#fff;--text:#111;--border:#b8c0cc;--radius:6px;--font-scale:1;--shadow:0 3px 10px rgba(0,0,0,.18)}
+*{box-sizing:border-box}
+body{margin:8px;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);font-size:calc(14px * var(--font-scale));overflow:hidden}
+.app{height:calc(100vh - 16px);display:flex;flex-direction:column;min-height:0}
+.topbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px;padding:6px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);position:relative;z-index:1000;flex:0 0 auto}
+.nowrap{white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+input,select,button,textarea{font:inherit}
+input,select,textarea{border:1px solid var(--border);border-radius:var(--radius);background:#fff;color:#111;padding:4px 5px}
+button{border:1px solid var(--accent-dark);border-radius:var(--radius);background:var(--accent);color:white;padding:5px 8px;cursor:pointer;white-space:nowrap}
+button:hover{filter:brightness(.95)}
+body.mode-3d input,body.mode-3d select,body.mode-3d textarea,body.mode-3d .panel,body.mode-3d .topbar{box-shadow:var(--shadow)}
+body.mode-3d button{
+  border-radius:14px;
+  border:1px solid rgba(0,0,0,.55);
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,.95) 0%, rgba(255,255,255,.55) 10%, rgba(255,255,255,.18) 32%, transparent 33%),
+    linear-gradient(to bottom, color-mix(in srgb, var(--accent) 88%, white 12%) 0%, var(--accent) 48%, color-mix(in srgb, var(--accent-dark) 82%, black 18%) 100%);
+  color:white;
+  text-shadow:0 -1px 1px rgba(0,0,0,.55);
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,.75),
+    inset 0 -4px 7px rgba(0,0,0,.28),
+    0 3px 5px rgba(0,0,0,.38);
+}
+body.mode-3d button:hover{filter:brightness(1.04)}
+body.mode-3d button:active{
+  transform:translateY(1px);
+  box-shadow:
+    inset 0 2px 5px rgba(0,0,0,.32),
+    inset 0 -2px 4px rgba(255,255,255,.22),
+    0 1px 2px rgba(0,0,0,.35);
+}
+body.mode-2d button,body.mode-2d input,body.mode-2d select,body.mode-2d textarea,body.mode-2d .panel,body.mode-2d .topbar{box-shadow:none}
+.table-wrap{width:100%;flex:1 1 auto;min-height:0;overflow:auto;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius)}
+table{width:100%;border-collapse:collapse;table-layout:fixed;background:white}
+th,td{border:1px solid var(--border);padding:3px 4px;vertical-align:middle;overflow:hidden;text-overflow:ellipsis}
+th{background:var(--accent);color:#fff;font-weight:bold;text-align:center;overflow:visible;position:sticky;top:0;z-index:900}
+.col-fecha{width:15ch;min-width:15ch;max-width:15ch}
+.col-cod{width:7ch;min-width:7ch;max-width:7ch;text-align:center;white-space:nowrap}
+.col-prio{width:10ch;min-width:10ch;max-width:10ch}
+.col-estado{width:13ch;min-width:13ch;max-width:13ch;text-align:center;white-space:nowrap}
+.col-acciones{width:12ch;min-width:12ch;max-width:12ch;text-align:center;white-space:nowrap}
+.col-tarea{width:30ch;min-width:30ch;white-space:normal;overflow:visible;text-overflow:clip;word-break:break-word;overflow-wrap:anywhere}
+.date-input{width:100%;min-width:0;padding:2px;font-size:.9em}
+.prio-select{width:100%;min-width:0;padding:2px;font-size:.9em}
+.actions{display:flex;gap:2px;justify-content:center;align-items:center}
+.actions button{padding:1px 3px;min-width:20px;line-height:1.2}
+.add-header{background:white;color:var(--accent);border:1px solid white;margin-left:4px;padding:0 4px;font-weight:bold}
+.filter-btn{cursor:pointer;margin-left:3px;font-weight:bold;background:#fff;border-radius:3px;padding:0 2px;display:inline-block}
+.azul{color:#005bff}.rojo{color:#d00000}.filter-active{outline:2px solid #fff;background:#ffe58a}
+tr.vencida td{background:#ffd1d1}tr.finalizada td{background:#d8ffd8}tr.iniciada td{background:#fff3c8}
+tr.prio-baja td:first-child{border-left:6px solid #777}tr.prio-media td:first-child{border-left:6px solid #007bff}tr.prio-alta td:first-child{border-left:6px solid #ff9800}tr.prio-critica td:first-child{border-left:6px solid #e00000}
+.sub-row td{background:#fbfbfb!important}.subtask{padding-left:22px;font-size:.94em;white-space:normal}
+.panel{display:none;position:fixed;top:10px;right:10px;left:auto;width:min(430px,calc(100vw - 20px));max-height:calc(100dvh - 20px);overflow:auto;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);z-index:2147483000;padding:10px;padding-bottom:18px}
+.panel h3{margin:0 0 8px;color:var(--accent-dark)}.panel-row{margin:8px 0;display:flex;gap:6px;align-items:center;flex-wrap:wrap}.panel textarea{width:100%;height:min(55dvh,420px);min-height:180px}.close-panel{float:right;background:#666;border-color:#555}
+.multi-filter{position:relative;display:inline-block}
+.multi-filter-btn{background:white;color:var(--accent);border:1px solid white;margin-left:4px;padding:0 4px;font-weight:bold}
+.multi-filter-panel{display:none;position:fixed;right:10px;top:90px;background:white;color:#111;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:6px;z-index:2147483647;min-width:150px;text-align:left;max-height:80vh;overflow:auto}
+.multi-filter-panel label{display:block;white-space:nowrap;margin:3px 0;font-weight:normal}
+.multi-filter-panel .mini-actions{display:flex;gap:4px;margin-top:5px}
+.multi-filter-panel .mini-actions button{padding:2px 5px;font-size:.85em}
 
-  .ajustes-grid{display:grid;grid-template-columns:1fr;gap:10px}
-  .grupo-ajuste{border:1px solid var(--borde);padding:8px;background:var(--tema-suave)}
-  .grupo-ajuste strong{display:block;margin-bottom:6px}
-  .opciones{display:flex;gap:6px;flex-wrap:wrap}
-  .opcion-radio{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--borde);background:var(--panel);padding:5px 7px;cursor:pointer;border-radius:var(--radio);box-shadow:var(--sombra)}
-  .opcion-radio input{margin:0}
-  .muestra-color{display:inline-block;width:14px;height:14px;border:1px solid #111;vertical-align:middle}
-  .c-negro{background:#111}.c-azul{background:#006ce0}.c-verde{background:#14873d}.c-amarillo{background:#ffc533}.c-rojo{background:#d61535}
-
-  @media(max-width:720px){
-    body{padding:5px;font-size:11px}
-    .barra-superior{grid-template-columns:1fr;gap:6px}
-    .herramientas{justify-content:flex-start}
-    .tabla-wrap{max-height:70vh}
-  }
-  @media print{
-    body{background:#fff!important}
-    *{box-shadow:none!important;border-radius:0!important}
-    .herramientas,.modal-fondo,.json-panel,.btn-mini,.btn-accion{display:none!important}
-    body{padding:0;font-size:12px}
-    .app{max-width:none;width:100%}
-    .tabla-wrap{border:1px solid #111;overflow:visible;width:100%}
-    table{min-width:0;width:100%;font-size:10px;table-layout:auto}
-    thead th, tbody td{padding:2px 3px}
-    th:nth-child(1),td:nth-child(1),
-    th:nth-child(2),td:nth-child(2),
-    th:nth-child(3),td:nth-child(3){width:10ch;min-width:10ch;max-width:10ch;white-space:nowrap}
-    th:nth-child(4),td:nth-child(4){width:1%;white-space:nowrap}
-    th:nth-child(5),td:nth-child(5){width:auto;white-space:normal;word-break:break-word}
-    th:nth-child(6),td:nth-child(6),
-    th:nth-child(8),td:nth-child(8){display:none!important}
-    th:nth-child(7),td:nth-child(7){width:9ch;min-width:9ch;white-space:nowrap;text-align:right}
-    .tarea-texto{display:block;word-break:break-word}
-  }
+body.theme-blue{--accent:#007bff;--accent-dark:#0056b3}body.theme-green{--accent:#15803d;--accent-dark:#0f5c2c}body.theme-red{--accent:#c1121f;--accent-dark:#8d0d16}body.theme-yellow{--accent:#d99a00;--accent-dark:#9a6e00}body.theme-black{--accent:#222;--accent-dark:#000}
+body.size-compact{--font-scale:.88}body.size-normal{--font-scale:1}body.size-large{--font-scale:1.15}
+@media print{body{background:white;margin:0;font-size:11px;overflow:visible}.app{height:auto;display:block}.topbar,.panel,.no-print,.col-acciones,td.col-acciones,th.col-acciones{width:12ch;min-width:12ch;max-width:12ch;text-align:center;white-space:nowrap}.table-wrap{border:none;overflow:visible}table{width:100%;table-layout:fixed}th,td{padding:2px 3px;border:1px solid #555}.col-fecha{width:15ch;min-width:15ch;max-width:15ch}.col-cod{width:7ch;min-width:7ch;max-width:7ch;text-align:center;white-space:nowrap}.col-prio{width:10ch;min-width:10ch;max-width:10ch}.col-estado{width:13ch;min-width:13ch;max-width:13ch;text-align:center;white-space:nowrap}.col-tarea{width:30ch;min-width:30ch;white-space:normal;overflow:visible;text-overflow:clip;word-break:break-word;overflow-wrap:anywhere}input,select{border:none;background:transparent;padding:0;font-size:inherit;appearance:none;-webkit-appearance:none}}
 </style>
 </head>
-<body>
+<body class="mode-2d theme-blue size-normal">
 <div class="app">
-  <div class="barra-superior">
-    <div class="filtro-box">
-      <div class="bloque-titulo">FILTRO</div>
-      <div class="filtro-dias-linea">
-        <span class="filtro-dias-label">Faltan menos de</span>
-        <input id="diasFiltro" type="number" min="0" step="1" value="" title="Días restantes hasta el vencimiento">
-        <strong>días</strong>
-      </div>
-      <div class="herramientas">
-        <button id="btnLimpiar">Limpiar filtros</button>
-        <button id="btnJson">Copiar/Pegar JSON</button>
-        <button onclick="window.print()">Imprimir</button>
-        <button id="btnAjustes">Ajustes</button>
-      </div>
-    </div>
-    <div class="busqueda-box">
-      <div class="bloque-titulo">BÚSQUEDA</div>
-      <input id="busqueda" type="text" placeholder="">
-      <div class="resumen" id="resumen"></div>
-    </div>
-  </div>
-
-  <div class="json-panel" id="jsonPanel">
-    <div style="margin-bottom:5px;font-weight:bold">Copia de seguridad JSON</div>
-    <textarea id="jsonTexto"></textarea>
-    <div class="herramientas" style="justify-content:flex-start;margin-bottom:0">
-      <button id="btnCopiarJson">Copiar JSON actual</button>
-      <button id="btnRestaurarJson">Restaurar desde texto pegado</button>
-      <button id="btnCerrarJson">Cerrar</button>
-    </div>
-  </div>
-
-  <div class="tabla-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th class="col-inicio"><button class="btn-mini btn-azul" data-filter="inicio" data-value="azul" title="Mostrar iniciadas">✓</button><button class="btn-mini btn-rojo" data-filter="inicio" data-value="rojo" title="Mostrar sin iniciar">✕</button> INICIO</th>
-          <th class="col-vence"><button class="btn-mini btn-azul" data-filter="vence" data-value="azul" title="Mostrar dentro de plazo">✓</button><button class="btn-mini btn-rojo" data-filter="vence" data-value="rojo" title="Mostrar vencidas">✕</button> VENCE</th>
-          <th class="col-fin"><button class="btn-mini btn-azul" data-filter="fin" data-value="azul" title="Mostrar finalizadas">✓</button><button class="btn-mini btn-rojo" data-filter="fin" data-value="rojo" title="Mostrar pendientes">✕</button> FIN</th>
-          <th class="col-cod">COD</th>
-          <th class="col-tarea">TAREA</th>
-          <th class="col-mas"><button class="btn-mini btn-add" id="btnNueva" title="Añadir nueva tarea">+</button></th>
-          <th class="col-estado">ESTADO</th>
-          <th class="col-acciones">ACCIONES</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
-  </div>
+<div class="topbar no-print">
+<span class="nowrap">Faltan menos de <input id="diasFiltro" type="number" min="0" style="width:58px" oninput="onFilterChange()"></span>
+<input id="textoFiltro" placeholder="Buscar texto..." style="min-width:180px;flex:1" oninput="onFilterChange()">
+<button onclick="nuevaTarea()">Nueva tarea</button><button onclick="exportarExcel()">Excel</button><button onclick="abrirPanel('panelJson')">JSON</button><button onclick="abrirPanel('panelHistorial');renderHistorial()">Historial</button><button onclick="abrirPanel('panelAjustes')">Ajustes</button><button onclick="window.print()">Imprimir</button><button onclick="limpiarFiltros()">Limpiar filtros</button>
 </div>
-
-<div class="modal-fondo" id="modalFondo">
-  <div class="modal">
-    <h2 id="modalTitulo">Nueva tarea</h2>
-    <div class="campo"><label for="mInicio">Inicio</label><input id="mInicio" type="date"></div>
-    <div class="campo"><label for="mVence">Vence</label><input id="mVence" type="date"></div>
-    <div class="campo"><label for="mFin">Fin</label><input id="mFin" type="date"></div>
-    <div class="campo"><label for="mTexto">Tarea</label><textarea id="mTexto"></textarea></div>
-    <div class="modal-botones">
-      <button id="mCancelar">Cancelar</button>
-      <button id="mGuardar"><strong>Guardar</strong></button>
-    </div>
-  </div>
+<div class="table-wrap"><table><thead><tr>
+<th class="col-fecha">INICIO <span id="fInicioSi" class="filter-btn azul" onclick="setFiltroEstado('inicio','si')">✔</span><span id="fInicioNo" class="filter-btn rojo" onclick="setFiltroEstado('inicio','no')">✖</span></th>
+<th class="col-fecha">VENCE <span id="fVenceOk" class="filter-btn azul" onclick="setFiltroEstado('vence','ok')">✔</span><span id="fVenceMal" class="filter-btn rojo" onclick="setFiltroEstado('vence','mal')">✖</span></th>
+<th class="col-fecha">FIN <span id="fFinSi" class="filter-btn azul" onclick="setFiltroEstado('fin','si')">✔</span><span id="fFinNo" class="filter-btn rojo" onclick="setFiltroEstado('fin','no')">✖</span></th>
+<th class="col-cod">COD</th><th class="col-tarea">TAREA <button class="add-header no-print" onclick="nuevaTarea()" title="Nueva tarea">+</button></th><th class="col-prio">PRIO <span class="multi-filter"><button class="multi-filter-btn no-print" onclick="toggleMultiFiltro(event,'prioFilterPanel')">▾</button><div id="prioFilterPanel" class="multi-filter-panel no-print"><label><input type="checkbox" value="baja" onchange="onMultiFiltroChange('prioridades')"> baja</label><label><input type="checkbox" value="media" onchange="onMultiFiltroChange('prioridades')"> media</label><label><input type="checkbox" value="alta" onchange="onMultiFiltroChange('prioridades')"> alta</label><label><input type="checkbox" value="critica" onchange="onMultiFiltroChange('prioridades')"> crítica</label><div class="mini-actions"><button onclick="marcarTodasMulti('prioridades')">Todas</button><button onclick="limpiarMulti('prioridades')">Ninguna</button></div></div></span></th><th class="col-estado">ESTADO <span class="multi-filter"><button class="multi-filter-btn no-print" onclick="toggleMultiFiltro(event,'estadoFilterPanel')">▾</button><div id="estadoFilterPanel" class="multi-filter-panel no-print"><label><input type="checkbox" value="PENDIENTE" onchange="onMultiFiltroChange('estados')"> PENDIENTE</label><label><input type="checkbox" value="INICIADA" onchange="onMultiFiltroChange('estados')"> INICIADA</label><label><input type="checkbox" value="VENCIDA" onchange="onMultiFiltroChange('estados')"> VENCIDA</label><label><input type="checkbox" value="FINALIZADA" onchange="onMultiFiltroChange('estados')"> FINALIZADA</label><div class="mini-actions"><button onclick="marcarTodasMulti('estados')">Todas</button><button onclick="limpiarMulti('estados')">Ninguna</button></div></div></span></th><th class="col-acciones no-print">ACCIONES</th>
+</tr></thead><tbody id="tablaTareas"></tbody></table></div>
 </div>
-
-
-<div class="modal-fondo" id="ajustesFondo">
-  <div class="modal">
-    <h2>Ajustes de apariencia</h2>
-    <div class="ajustes-grid">
-      <div class="grupo-ajuste">
-        <strong>1. Apariencia de botones e inputs</strong>
-        <div class="opciones">
-          <label class="opcion-radio"><input type="radio" name="modoVisual" value="2d"> 2D plano</label>
-          <label class="opcion-radio"><input type="radio" name="modoVisual" value="3d"> 3D con relieve</label>
-        </div>
-      </div>
-      <div class="grupo-ajuste">
-        <strong>2. Color del tema</strong>
-        <div class="opciones">
-          <label class="opcion-radio"><input type="radio" name="temaColor" value="negro"><span class="muestra-color c-negro"></span> Negro</label>
-          <label class="opcion-radio"><input type="radio" name="temaColor" value="azul"><span class="muestra-color c-azul"></span> Azul</label>
-          <label class="opcion-radio"><input type="radio" name="temaColor" value="verde"><span class="muestra-color c-verde"></span> Verde</label>
-          <label class="opcion-radio"><input type="radio" name="temaColor" value="amarillo"><span class="muestra-color c-amarillo"></span> Amarillo</label>
-          <label class="opcion-radio"><input type="radio" name="temaColor" value="rojo"><span class="muestra-color c-rojo"></span> Rojo</label>
-        </div>
-      </div>
-      <div class="grupo-ajuste">
-        <strong>3. Tamaño visual de la tabla</strong>
-        <div class="opciones">
-          <label class="opcion-radio"><input type="radio" name="densidadVisual" value="compacta"> Compacta</label>
-          <label class="opcion-radio"><input type="radio" name="densidadVisual" value="normal"> Normal</label>
-          <label class="opcion-radio"><input type="radio" name="densidadVisual" value="grande"> Grande</label>
-        </div>
-      </div>
-    </div>
-    <div class="modal-botones">
-      <button id="btnAjustesDefecto">Valores por defecto</button>
-      <button id="btnCerrarAjustes"><strong>Cerrar</strong></button>
-    </div>
-  </div>
+<div id="panelAjustes" class="panel no-print"><button class="close-panel" onclick="cerrarPanel('panelAjustes')">Cerrar</button><h3>Ajustes</h3>
+<div class="panel-row"><label>Modo visual:</label><select id="ajusteModo" onchange="guardarAjustesDesdePanel()"><option value="2d">2D</option><option value="3d">3D</option></select></div>
+<div class="panel-row"><label>Tema:</label><select id="ajusteTema" onchange="guardarAjustesDesdePanel()"><option value="blue">Azul</option><option value="green">Verde</option><option value="red">Rojo</option><option value="yellow">Amarillo</option><option value="black">Negro</option></select></div>
+<div class="panel-row"><label>Escala:</label><select id="ajusteEscala" onchange="guardarAjustesDesdePanel()"><option value="compact">Compacto</option><option value="normal">Normal</option><option value="large">Grande</option></select></div>
 </div>
+<div id="panelJson" class="panel no-print"><button class="close-panel" onclick="cerrarPanel('panelJson')">Cerrar</button><h3>Exportar / Importar JSON</h3><div class="panel-row"><button onclick="exportarJSON()">Copiar JSON</button><button onclick="prepararJSON()">Ver JSON</button><button onclick="importarJSON()">Importar desde caja</button></div><textarea id="jsonBox" placeholder="Aquí aparecerá el JSON exportado o pega aquí un JSON para importar..."></textarea></div>
+<div id="panelHistorial" class="panel no-print"><button class="close-panel" onclick="cerrarPanel('panelHistorial')">Cerrar</button><h3>Historial de cambios</h3><div class="panel-row"><button onclick="vaciarHistorial()">Vaciar historial</button></div><div id="historialBox"></div></div>
 
 <script>
-(function(){
-'use strict';
-var STORAGE_KEY='notas_tareas_limpia_v1';
-var SETTINGS_KEY='notas_tareas_ajustes_v1';
-var ajustes={modo:'2d',tema:'negro',densidad:'normal'};
-var tasks=[];
-var filters={inicio:null, vence:null, fin:null, resumen:null};
-var editing={mode:'new', id:null, parentId:null};
-
-var $=function(id){return document.getElementById(id)};
-function todayISO(){var d=new Date(); d.setHours(0,0,0,0); return d.toISOString().slice(0,10)}
-function parseDate(s){if(!s)return null; var p=s.split('-'); if(p.length!==3)return null; return new Date(+p[0],+p[1]-1,+p[2]);}
-function fmt(s){if(!s)return '<span class="fecha-vacia">-</span>'; var p=s.split('-'); return p[2]+'/'+p[1]+'/'+p[0];}
-function uid(){return 't'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
-function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-
-function loadSettings(){
-  try{ajustes=Object.assign(ajustes,JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}')||{});}catch(e){}
-  applySettings();
-}
-function saveSettings(){localStorage.setItem(SETTINGS_KEY,JSON.stringify(ajustes));}
-function applySettings(){
-  document.body.classList.remove('modo-2d','modo-3d','tema-negro','tema-azul','tema-verde','tema-amarillo','tema-rojo','densidad-compacta','densidad-normal','densidad-grande');
-  document.body.classList.add('modo-'+ajustes.modo,'tema-'+ajustes.tema,'densidad-'+ajustes.densidad);
-  Array.prototype.forEach.call(document.querySelectorAll('input[name="modoVisual"]'),function(i){i.checked=i.value===ajustes.modo});
-  Array.prototype.forEach.call(document.querySelectorAll('input[name="temaColor"]'),function(i){i.checked=i.value===ajustes.tema});
-  Array.prototype.forEach.call(document.querySelectorAll('input[name="densidadVisual"]'),function(i){i.checked=i.value===ajustes.densidad});
-}
-function resetSettings(){ajustes={modo:'2d',tema:'negro',densidad:'normal'};saveSettings();applySettings();}
-
-function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(tasks));}
-function load(){
-  try{tasks=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')||[]}catch(e){tasks=[]}
-  if(tasks.length===0){
-    tasks=[
-      {id:uid(),inicio:'2026-04-01',vence:'2026-05-01',fin:'2026-04-20',texto:'Desatascar pocillo patio',children:[]},
-      {id:uid(),inicio:'2026-03-04',vence:'2026-03-15',fin:'',texto:'Llamar a yoigo',children:[]},
-      {id:uid(),inicio:'2026-01-24',vence:'2026-07-03',fin:'',texto:'Regalo boda Daniel',children:[]}
-    ];
-    save();
-  }
-}
-function allItems(list, out){out=out||[]; list.forEach(function(t){out.push(t); allItems(t.children||[],out)}); return out;}
-function findWithParent(id, list, parent){
-  list=list||tasks;
-  for(var i=0;i<list.length;i++){
-    if(list[i].id===id)return {item:list[i], list:list, parent:parent||null, index:i};
-    var r=findWithParent(id,list[i].children||[],list[i]); if(r)return r;
-  }
-  return null;
-}
-function codeFor(path){return path.map(function(n){return String(n+1).padStart(2,'0')}).join('.').replace(/^0/,'000');}
-function isStarted(t){return !!t.inicio;}
-function isFinished(t){return !!t.fin;}
-function isExpired(t){
-  if(!t.vence || t.fin)return false;
-  var v=parseDate(t.vence), h=parseDate(todayISO());
-  return v && v<h;
-}
-function isWithinDays(t, days){
-  if(days==='' || days===null || isNaN(days))return true;
-  if(!t.vence || t.fin)return false;
-  var v=parseDate(t.vence), h=parseDate(todayISO());
-  if(!v)return false;
-  var diff=Math.ceil((v-h)/86400000);
-  return diff>=0 && diff<=Number(days);
-}
-function matchesState(t){
-  if(filters.inicio==='azul' && !isStarted(t))return false;
-  if(filters.inicio==='rojo' && isStarted(t))return false;
-  if(filters.vence==='azul' && isExpired(t))return false;
-  if(filters.vence==='rojo' && !isExpired(t))return false;
-  if(filters.fin==='azul' && !isFinished(t))return false;
-  if(filters.fin==='rojo' && isFinished(t))return false;
-  return true;
-}
-function matchesResumen(t){
-  if(filters.resumen==='iniciadas')return isStarted(t);
-  if(filters.resumen==='pendientes')return !isFinished(t);
-  if(filters.resumen==='finalizadas')return isFinished(t);
-  if(filters.resumen==='vencidas')return isExpired(t);
-  return true;
-}
-function textBlob(t, code){
-  var s=[code,t.texto,t.inicio,t.vence,t.fin].join(' ').toLowerCase();
-  (t.children||[]).forEach(function(c,i){s+=' '+textBlob(c,code+'.'+(i+1));});
-  return s;
-}
-function itemOwnText(t, code){return [code,t.texto,t.inicio,t.vence,t.fin].join(' ').toLowerCase();}
-function getStatus(t){
-  if(isFinished(t))return '<span class="estado-pill estado-ok">Finalizada</span>';
-  if(isExpired(t))return '<span class="estado-pill estado-alerta">Vencida</span>';
-  if(isStarted(t))return '<span class="estado-pill estado-pend">Iniciada</span>';
-  return '<span class="estado-pill">Sin iniciar</span>';
-}
-function passes(t, path){
-  var days=$('diasFiltro').value;
-  var q=$('busqueda').value.trim().toLowerCase();
-  var code=codeFor(path);
-  var stateOk=matchesState(t) && matchesResumen(t);
-  var daysOk=isWithinDays(t,days);
-  var textOk=!q || textBlob(t,code).indexOf(q)>=0;
-  return stateOk && daysOk && textOk;
-}
-function renderList(list, level, path, rows){
-  list.forEach(function(t,idx){
-    var p=path.concat(idx);
-    var children=t.children||[];
-    var childRows=[];
-    renderList(children,level+1,p,childRows);
-    var showSelf=passes(t,p) || childRows.length>0;
-    if(showSelf){
-      var code=codeFor(p);
-      rows.push('<tr data-id="'+t.id+'">'+
-        '<td>'+fmt(t.inicio)+'</td>'+
-        '<td>'+fmt(t.vence)+'</td>'+
-        '<td>'+fmt(t.fin)+'</td>'+
-        '<td class="cod">'+esc(code)+'</td>'+
-        '<td><div class="tarea-texto"><span style="display:inline-block;width:'+(level*22)+'px"></span><span>'+(level>0?'↳ ':'')+esc(t.texto)+'</span></div></td>'+ 
-        '<td class="col-mas"><button class="btn-mini btn-sub btn-accion" data-act="addSub" data-id="'+t.id+'" title="Añadir subtarea">＋</button></td>'+
-        '<td>'+getStatus(t)+'</td>'+
-        '<td class="col-acciones">'+
-          '<button class="btn-mini btn-sub btn-accion" data-act="addSub" data-id="'+t.id+'" title="Añadir subtarea">＋</button>'+
-          '<button class="btn-mini btn-edit btn-accion" data-act="edit" data-id="'+t.id+'" title="Editar">✎</button>'+
-          '<button class="btn-mini btn-del btn-accion" data-act="del" data-id="'+t.id+'" title="Eliminar">🗑</button>'+
-        '</td></tr>');
-      rows.push.apply(rows,childRows);
-    }
-  });
-}
-function render(){
-  var rows=[]; renderList(tasks,0,[],rows);
-  $('tbody').innerHTML=rows.length?rows.join(''):'<tr><td colspan="8" class="sin-resultados">No hay tareas que coincidan con los filtros actuales.</td></tr>';
-  updateFilterButtons();
-  var all=allItems(tasks,[]);
-  var iniciadas=all.filter(isStarted).length;
-  var pendientes=all.filter(function(t){return !isFinished(t)}).length;
-  var finalizadas=all.filter(isFinished).length;
-  var vencidas=all.filter(isExpired).length;
-  var activo=function(k){return filters.resumen===k?' btn-resumen-activo':''};
-  var totalActivo=filters.resumen===null?' btn-resumen-activo':'';
-  $('resumen').innerHTML=
-    '<button class="btn-resumen'+totalActivo+'" data-resumen-filter="total"><strong>Total:</strong> '+all.length+'</button>'+
-    '<button class="btn-resumen" data-resumen-filter="visibles"><strong>Visibles:</strong> '+rows.length+'</button>'+
-    '<button class="btn-resumen'+activo('iniciadas')+'" data-resumen-filter="iniciadas"><strong>Iniciadas:</strong> '+iniciadas+'</button>'+
-    '<button class="btn-resumen'+activo('pendientes')+'" data-resumen-filter="pendientes"><strong>Pendientes:</strong> '+pendientes+'</button>'+
-    '<button class="btn-resumen'+activo('finalizadas')+'" data-resumen-filter="finalizadas"><strong>Finalizadas:</strong> '+finalizadas+'</button>'+
-    '<button class="btn-resumen btn-resumen-vencidas'+activo('vencidas')+'" data-resumen-filter="vencidas"><strong>Vencidas:</strong> '+vencidas+'</button>';
-}
-function updateFilterButtons(){
-  Array.prototype.forEach.call(document.querySelectorAll('[data-filter]'),function(b){
-    b.classList.remove('filtro-activo','filtro-activo-rojo');
-    if(filters[b.getAttribute('data-filter')]===b.getAttribute('data-value')){
-      b.classList.add(b.getAttribute('data-value')==='rojo'?'filtro-activo-rojo':'filtro-activo');
-    }
-  });
-}
-function openModal(mode,id,parentId){
-  editing={mode:mode,id:id||null,parentId:parentId||null};
-  var t=id?findWithParent(id).item:{inicio:'',vence:'',fin:'',texto:''};
-  $('modalTitulo').textContent=mode==='edit'?'Editar tarea':(mode==='sub'?'Nueva subtarea':'Nueva tarea');
-  $('mInicio').value=t.inicio||''; $('mVence').value=t.vence||''; $('mFin').value=t.fin||''; $('mTexto').value=t.texto||'';
-  $('modalFondo').style.display='flex'; setTimeout(function(){$('mTexto').focus()},50);
-}
-function closeModal(){$('modalFondo').style.display='none';}
-function modalSave(){
-  var texto=$('mTexto').value.trim();
-  if(!texto){alert('Escribe el texto de la tarea.');return;}
-  var data={inicio:$('mInicio').value,vence:$('mVence').value,fin:$('mFin').value,texto:texto};
-  if(editing.mode==='edit'){
-    var r=findWithParent(editing.id); if(!r)return;
-    r.item.inicio=data.inicio; r.item.vence=data.vence; r.item.fin=data.fin; r.item.texto=data.texto;
-  }else{
-    var nuevo={id:uid(),inicio:data.inicio,vence:data.vence,fin:data.fin,texto:data.texto,children:[]};
-    if(editing.mode==='sub'){
-      var p=findWithParent(editing.parentId); if(!p)return;
-      p.item.children=p.item.children||[]; p.item.children.push(nuevo);
-    }else tasks.push(nuevo);
-  }
-  save(); closeModal(); render();
-}
-function delItem(id){
-  var r=findWithParent(id); if(!r)return;
-  if(!confirm('¿Eliminar esta tarea y todas sus subtareas?'))return;
-  r.list.splice(r.index,1); save(); render();
-}
-function setup(){
-  loadSettings();
-  load(); render();
-  $('diasFiltro').addEventListener('input',render);
-  $('busqueda').addEventListener('input',render);
-  $('resumen').addEventListener('click',function(e){
-    var b=e.target.closest('button[data-resumen-filter]'); if(!b)return;
-    var v=b.getAttribute('data-resumen-filter');
-    if(v==='total'){
-      $('diasFiltro').value=''; $('busqueda').value=''; filters={inicio:null,vence:null,fin:null,resumen:null};
-    }else if(v==='visibles'){
-      filters.resumen=null;
-    }else{
-      filters.resumen=(filters.resumen===v)?null:v;
-    }
-    render();
-  });
-  $('btnNueva').addEventListener('click',function(){openModal('new')});
-  $('mCancelar').addEventListener('click',closeModal);
-  $('mGuardar').addEventListener('click',modalSave);
-  $('modalFondo').addEventListener('click',function(e){if(e.target===$('modalFondo'))closeModal();});
-  $('btnLimpiar').addEventListener('click',function(){$('diasFiltro').value='';$('busqueda').value='';filters={inicio:null,vence:null,fin:null,resumen:null};render();});
-  Array.prototype.forEach.call(document.querySelectorAll('[data-filter]'),function(b){
-    b.addEventListener('click',function(){
-      var f=b.getAttribute('data-filter'), v=b.getAttribute('data-value');
-      filters[f]=(filters[f]===v)?null:v; render();
-    });
-  });
-  $('tbody').addEventListener('click',function(e){
-    var b=e.target.closest('button'); if(!b)return;
-    var act=b.getAttribute('data-act'), id=b.getAttribute('data-id');
-    if(act==='addSub')openModal('sub',null,id);
-    if(act==='edit')openModal('edit',id);
-    if(act==='del')delItem(id);
-  });
-  $('btnJson').addEventListener('click',function(){var p=$('jsonPanel');p.style.display=p.style.display==='block'?'none':'block';$('jsonTexto').value=JSON.stringify(tasks,null,2);});
-  $('btnAjustes').addEventListener('click',function(){applySettings();$('ajustesFondo').style.display='flex';});
-  $('btnCerrarAjustes').addEventListener('click',function(){$('ajustesFondo').style.display='none';});
-  $('btnAjustesDefecto').addEventListener('click',resetSettings);
-  $('ajustesFondo').addEventListener('click',function(e){if(e.target===$('ajustesFondo'))$('ajustesFondo').style.display='none';});
-  Array.prototype.forEach.call(document.querySelectorAll('input[name="modoVisual"]'),function(i){i.addEventListener('change',function(){ajustes.modo=this.value;saveSettings();applySettings();});});
-  Array.prototype.forEach.call(document.querySelectorAll('input[name="temaColor"]'),function(i){i.addEventListener('change',function(){ajustes.tema=this.value;saveSettings();applySettings();});});
-  Array.prototype.forEach.call(document.querySelectorAll('input[name="densidadVisual"]'),function(i){i.addEventListener('change',function(){ajustes.densidad=this.value;saveSettings();applySettings();});});
-  $('btnCerrarJson').addEventListener('click',function(){$('jsonPanel').style.display='none';});
-  $('btnCopiarJson').addEventListener('click',function(){var txt=JSON.stringify(tasks,null,2);$('jsonTexto').value=txt;$('jsonTexto').select();document.execCommand('copy');alert('JSON copiado.');});
-  $('btnRestaurarJson').addEventListener('click',function(){
-    try{var data=JSON.parse($('jsonTexto').value); if(!Array.isArray(data))throw new Error('Formato no válido'); tasks=data; save(); render(); alert('Datos restaurados.');}
-    catch(e){alert('No se ha podido restaurar. Revisa el JSON.');}
-  });
-}
-setup();
-})();
+"use strict";
+const STORAGE_TAREAS="notas_tareas_v3_tareas",STORAGE_HISTORIAL="notas_tareas_v3_historial",STORAGE_FILTROS="notas_tareas_v3_filtros",STORAGE_AJUSTES="notas_tareas_v3_ajustes";
+let tareas=cargarJSONSeguro(STORAGE_TAREAS,[]),historial=cargarJSONSeguro(STORAGE_HISTORIAL,[]),filtros=cargarJSONSeguro(STORAGE_FILTROS,{texto:"",dias:"",inicio:null,vence:null,fin:null,prioridades:[],estados:[]}),ajustes=cargarJSONSeguro(STORAGE_AJUSTES,{modo:"2d",tema:"blue",escala:"normal"});
+function cargarJSONSeguro(c,v){try{const r=localStorage.getItem(c);return r?JSON.parse(r):v}catch(e){return v}}
+function guardarJSONSeguro(c,v){try{localStorage.setItem(c,JSON.stringify(v));return true}catch(e){alert("No se pudo guardar en localStorage: "+e.message);return false}}
+function escapeHTML(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function normalizarTexto(v){return String(v??"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")}
+function hoySinHora(){const h=new Date();h.setHours(0,0,0,0);return h}
+function fechaSinHora(f){if(!f)return null;const d=new Date(f+"T00:00:00");d.setHours(0,0,0,0);return d}
+function diasHasta(f){const d=fechaSinHora(f);if(!d)return null;return Math.ceil((d.getTime()-hoySinHora().getTime())/(1000*60*60*24))}
+function generarId(){return"id_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8)}
+function siguienteCodigo(){let max=0;tareas.forEach(t=>{const n=parseInt(String(t.cod||"").replace(/\D/g,""),10);if(!isNaN(n))max=Math.max(max,n)});return String(max+1).padStart(4,"0").slice(-4)}
+function logAccion(txt){historial.unshift({fecha:new Date().toLocaleString(),texto:String(txt)});if(historial.length>500)historial=historial.slice(0,500);guardarJSONSeguro(STORAGE_HISTORIAL,historial)}
+function renderHistorial(){const b=document.getElementById("historialBox");b.innerHTML=historial.length?historial.map(h=>`<div style="border-bottom:1px solid #ddd;padding:5px 0;"><b>${escapeHTML(h.fecha)}</b><br>${escapeHTML(h.texto)}</div>`).join(""):"<p>No hay historial todavía.</p>"}
+function vaciarHistorial(){if(!confirm("¿Vaciar todo el historial?"))return;historial=[];guardarJSONSeguro(STORAGE_HISTORIAL,historial);renderHistorial()}
+function nuevaTarea(){const texto=prompt("Texto de la nueva tarea:");if(!texto||!texto.trim())return;const t={id:generarId(),cod:siguienteCodigo(),texto:texto.trim(),inicio:"",vence:"",fin:"",prioridad:"media",subtareas:[]};tareas.unshift(t);logAccion("Creada tarea "+t.cod+": "+t.texto);guardarTareasYRender()}
+function editarTarea(id){const t=tareas.find(x=>x.id===id);if(!t)return;const n=prompt("Editar tarea:",t.texto);if(!n||!n.trim())return;const a=t.texto;t.texto=n.trim();logAccion("Editada tarea "+t.cod+": "+a+" → "+t.texto);guardarTareasYRender()}
+function eliminarTarea(id){const i=tareas.findIndex(x=>x.id===id);if(i<0)return;if(!confirm("¿Eliminar esta tarea y sus subtareas?"))return;const t=tareas[i];tareas.splice(i,1);logAccion("Eliminada tarea "+t.cod+": "+t.texto);guardarTareasYRender()}
+function buscarSubtarea(lista,id){if(!Array.isArray(lista))return null;for(const s of lista){if(s.id===id)return s;const h=buscarSubtarea(s.subtareas,id);if(h)return h}return null}
+function eliminarSubtareaRec(lista,id){if(!Array.isArray(lista))return null;const i=lista.findIndex(x=>x.id===id);if(i>=0)return lista.splice(i,1)[0];for(const s of lista){const r=eliminarSubtareaRec(s.subtareas,id);if(r)return r}return null}
+function addSubtarea(id){const t=tareas.find(x=>x.id===id);if(!t)return;const texto=prompt("Nueva subtarea:");if(!texto||!texto.trim())return;if(!Array.isArray(t.subtareas))t.subtareas=[];t.subtareas.push({id:generarId(),cod:"",texto:texto.trim(),inicio:"",vence:"",fin:"",prioridad:"media",subtareas:[]});logAccion("Añadida subtarea en "+t.cod+": "+texto.trim());guardarTareasYRender()}
+function addSubtareaDentro(tid,sid){const t=tareas.find(x=>x.id===tid);if(!t)return;const padre=buscarSubtarea(t.subtareas,sid);if(!padre)return;const texto=prompt("Nueva subtarea dentro de esta subtarea:");if(!texto||!texto.trim())return;if(!Array.isArray(padre.subtareas))padre.subtareas=[];padre.subtareas.push({id:generarId(),cod:"",texto:texto.trim(),inicio:"",vence:"",fin:"",prioridad:"media",subtareas:[]});logAccion("Añadida subtarea dentro de subtarea en "+t.cod+": "+texto.trim());guardarTareasYRender()}
+function editarSubtarea(tid,sid){const t=tareas.find(x=>x.id===tid);if(!t||!Array.isArray(t.subtareas))return;const s=buscarSubtarea(t.subtareas,sid);if(!s)return;const n=prompt("Editar subtarea:",s.texto);if(!n||!n.trim())return;const a=s.texto;s.texto=n.trim();logAccion("Editada subtarea en "+t.cod+": "+a+" → "+s.texto);guardarTareasYRender()}
+function eliminarSubtarea(tid,sid){const t=tareas.find(x=>x.id===tid);if(!t||!Array.isArray(t.subtareas))return;if(!confirm("¿Eliminar esta subtarea y sus subtareas internas?"))return;const s=eliminarSubtareaRec(t.subtareas,sid);if(!s)return;logAccion("Eliminada subtarea en "+t.cod+": "+s.texto);guardarTareasYRender()}
+function guardarTareasYRender(){guardarJSONSeguro(STORAGE_TAREAS,tareas);render()}
+function getEstado(t){if(t.fin)return{texto:"FINALIZADA",clase:"finalizada"};if(t.vence){const d=diasHasta(t.vence);if(d!==null&&d<0)return{texto:"VENCIDA",clase:"vencida"}}if(t.inicio)return{texto:"INICIADA",clase:"iniciada"};return{texto:"PENDIENTE",clase:""}}
+function avisarAndroid(txt){try{if(window.Android&&typeof Android.lanzarAlarma==="function")Android.lanzarAlarma(txt)}catch(e){}}
+function revisarAlarmas(lista){let avisadas={};try{avisadas=JSON.parse(sessionStorage.getItem("notas_tareas_v3_avisadas_sesion")||"{}")}catch(e){};let cambiado=false;lista.forEach(t=>{if(!t.vence||t.fin)return;const d=diasHasta(t.vence);if(d!==null&&d>=0&&d<=1&&!avisadas[t.id]){avisadas[t.id]=true;cambiado=true;avisarAndroid("Vence pronto: "+t.cod+" - "+t.texto)}});if(cambiado)sessionStorage.setItem("notas_tareas_v3_avisadas_sesion",JSON.stringify(avisadas))}
+function toggleMultiFiltro(ev,id){ev.stopPropagation();document.querySelectorAll(".multi-filter-panel").forEach(p=>{if(p.id!==id)p.style.display="none"});const p=document.getElementById(id);if(p.style.display==="block"){p.style.display="none";return}const r=ev.currentTarget.getBoundingClientRect();p.style.left=Math.max(6,Math.min(r.left,window.innerWidth-p.offsetWidth-12))+"px";p.style.top=Math.min(r.bottom+6,window.innerHeight-20)+"px";p.style.right="auto";p.style.display="block"}
+document.addEventListener("click",()=>{document.querySelectorAll(".multi-filter-panel").forEach(p=>p.style.display="none")});
+function onMultiFiltroChange(tipo){const panelId=tipo==="prioridades"?"prioFilterPanel":"estadoFilterPanel";filtros[tipo]=Array.from(document.querySelectorAll("#"+panelId+" input[type=checkbox]:checked")).map(x=>x.value);guardarJSONSeguro(STORAGE_FILTROS,filtros);render()}
+function marcarTodasMulti(tipo){const panelId=tipo==="prioridades"?"prioFilterPanel":"estadoFilterPanel";document.querySelectorAll("#"+panelId+" input[type=checkbox]").forEach(x=>x.checked=true);onMultiFiltroChange(tipo)}
+function limpiarMulti(tipo){const panelId=tipo==="prioridades"?"prioFilterPanel":"estadoFilterPanel";document.querySelectorAll("#"+panelId+" input[type=checkbox]").forEach(x=>x.checked=false);onMultiFiltroChange(tipo)}
+function cargarMultiFiltrosEnPantalla(){const prioridades=Array.isArray(filtros.prioridades)?filtros.prioridades:[];const estados=Array.isArray(filtros.estados)?filtros.estados:[];document.querySelectorAll("#prioFilterPanel input[type=checkbox]").forEach(x=>x.checked=prioridades.includes(x.value));document.querySelectorAll("#estadoFilterPanel input[type=checkbox]").forEach(x=>x.checked=estados.includes(x.value))}
+function onFilterChange(){filtros.texto=document.getElementById("textoFiltro").value;filtros.dias=document.getElementById("diasFiltro").value;guardarJSONSeguro(STORAGE_FILTROS,filtros);render()}
+function setFiltroEstado(tipo,valor){filtros[tipo]=filtros[tipo]===valor?null:valor;guardarJSONSeguro(STORAGE_FILTROS,filtros);render()}
+function limpiarFiltros(){filtros={texto:"",dias:"",inicio:null,vence:null,fin:null,prioridades:[],estados:[]};guardarJSONSeguro(STORAGE_FILTROS,filtros);document.getElementById("textoFiltro").value="";document.getElementById("diasFiltro").value="";cargarMultiFiltrosEnPantalla();render()}
+function subtareaCumpleMultiFiltros(s){if(Array.isArray(filtros.prioridades)&&filtros.prioridades.length>0&&!filtros.prioridades.includes(s.prioridad||"media"))return false;if(Array.isArray(filtros.estados)&&filtros.estados.length>0&&!filtros.estados.includes(getEstado(s).texto))return false;return true}
+function tieneSubtareaQueCumpleMultiFiltros(lista){if(!Array.isArray(lista))return false;return lista.some(s=>subtareaCumpleMultiFiltros(s)||tieneSubtareaQueCumpleMultiFiltros(s.subtareas))}
+function cumpleFiltros(t){const txt=normalizarTexto(filtros.texto);if(txt){const total=normalizarTexto([t.cod,t.texto,...(Array.isArray(t.subtareas)?t.subtareas.map(s=>s.texto):[])].join(" "));if(!total.includes(txt))return false}if(filtros.dias!==""&&filtros.dias!=null){const n=parseInt(filtros.dias,10);if(!isNaN(n)&&n>=0){if(!t.vence)return false;const d=diasHasta(t.vence);if(d===null||d<0||d>n)return false}}if(filtros.inicio){if(filtros.inicio==="si"&&!t.inicio)return false;if(filtros.inicio==="no"&&t.inicio)return false}if(filtros.fin){if(filtros.fin==="si"&&!t.fin)return false;if(filtros.fin==="no"&&t.fin)return false}if(filtros.vence){const d=diasHasta(t.vence),vencida=d!==null&&d<0;if(filtros.vence==="ok"&&vencida)return false;if(filtros.vence==="mal"&&!vencida)return false}const hayFiltroPrioridad=Array.isArray(filtros.prioridades)&&filtros.prioridades.length>0;const hayFiltroEstado=Array.isArray(filtros.estados)&&filtros.estados.length>0;if(hayFiltroPrioridad||hayFiltroEstado){const tareaCumple=(!hayFiltroPrioridad||filtros.prioridades.includes(t.prioridad||"media"))&&(!hayFiltroEstado||filtros.estados.includes(getEstado(t).texto));const algunaSubCumple=tieneSubtareaQueCumpleMultiFiltros(t.subtareas);if(!tareaCumple&&!algunaSubCumple)return false}return true}
+function marcarFiltrosActivos(){[["fInicioSi",filtros.inicio==="si"],["fInicioNo",filtros.inicio==="no"],["fVenceOk",filtros.vence==="ok"],["fVenceMal",filtros.vence==="mal"],["fFinSi",filtros.fin==="si"],["fFinNo",filtros.fin==="no"]].forEach(([id,a])=>{const e=document.getElementById(id);if(e)e.classList.toggle("filter-active",!!a)})}
+function render(){const tb=document.getElementById("tablaTareas");tb.innerHTML="";marcarFiltrosActivos();const visibles=tareas.filter(cumpleFiltros).sort((a,b)=>Number(b.cod||0)-Number(a.cod||0));visibles.forEach(t=>{if(!Array.isArray(t.subtareas))t.subtareas=[];if(!t.id)t.id=generarId();if(!t.cod)t.cod=siguienteCodigo();if(!t.prioridad)t.prioridad="media";const e=getEstado(t);const tr=document.createElement("tr");tr.className=[e.clase,"prio-"+t.prioridad].filter(Boolean).join(" ");tr.innerHTML=`<td class="col-fecha"><input class="date-input" type="date" value="${escapeHTML(t.inicio)}" onchange="actualizarCampo('${t.id}','inicio',this.value)"></td><td class="col-fecha"><input class="date-input" type="date" value="${escapeHTML(t.vence)}" onchange="actualizarCampo('${t.id}','vence',this.value)"></td><td class="col-fecha"><input class="date-input" type="date" value="${escapeHTML(t.fin)}" onchange="actualizarCampo('${t.id}','fin',this.value)"></td><td class="col-cod">${escapeHTML(t.cod)}</td><td class="col-tarea">${escapeHTML(t.texto)}</td><td class="col-prio"><select class="prio-select" onchange="actualizarCampo('${t.id}','prioridad',this.value)"><option value="baja" ${t.prioridad==="baja"?"selected":""}>baja</option><option value="media" ${t.prioridad==="media"?"selected":""}>media</option><option value="alta" ${t.prioridad==="alta"?"selected":""}>alta</option><option value="critica" ${t.prioridad==="critica"?"selected":""}>crítica</option></select></td><td class="col-estado">${e.texto}</td><td class="col-acciones no-print"><div class="actions"><button title="Añadir subtarea" onclick="addSubtarea('${t.id}')">＋</button><button title="Editar tarea" onclick="editarTarea('${t.id}')">✎</button><button title="Eliminar tarea" onclick="eliminarTarea('${t.id}')">🗑</button></div></td>`;tb.appendChild(tr);renderSubtareas(tb,t,t.subtareas,1)});revisarAlarmas(visibles)}
+function actualizarCampoSubtarea(tid,sid,campo,valor){const t=tareas.find(x=>x.id===tid);if(!t)return;const s=buscarSubtarea(t.subtareas,sid);if(!s)return;const a=s[campo]??"";s[campo]=valor;logAccion("Actualizado "+campo+" en subtarea de "+t.cod+": "+a+" → "+valor);guardarTareasYRender()}
+function renderSubtareas(tb,t,lista,nivel){if(!Array.isArray(lista))return;lista.forEach(s=>{if(!subtareaCumpleMultiFiltros(s)&&!tieneSubtareaQueCumpleMultiFiltros(s.subtareas))return;if(!s.id)s.id=generarId();if(!Array.isArray(s.subtareas))s.subtareas=[];if(!s.prioridad)s.prioridad="media";if(s.inicio===undefined)s.inicio="";if(s.vence===undefined)s.vence="";if(s.fin===undefined)s.fin="";const e=getEstado(s);const sr=document.createElement("tr");sr.className=["sub-row",e.clase,"prio-"+s.prioridad].filter(Boolean).join(" ");const margen=Math.min(22*nivel,88);sr.innerHTML=`<td class="col-fecha"><input class="date-input" type="date" value="${escapeHTML(s.inicio)}" onchange="actualizarCampoSubtarea('${t.id}','${s.id}','inicio',this.value)"></td><td class="col-fecha"><input class="date-input" type="date" value="${escapeHTML(s.vence)}" onchange="actualizarCampoSubtarea('${t.id}','${s.id}','vence',this.value)"></td><td class="col-fecha"><input class="date-input" type="date" value="${escapeHTML(s.fin)}" onchange="actualizarCampoSubtarea('${t.id}','${s.id}','fin',this.value)"></td><td class="col-cod"></td><td class="col-tarea subtask" style="padding-left:${margen}px">└─ ${escapeHTML(s.texto)}</td><td class="col-prio"><select class="prio-select" onchange="actualizarCampoSubtarea('${t.id}','${s.id}','prioridad',this.value)"><option value="baja" ${s.prioridad==="baja"?"selected":""}>baja</option><option value="media" ${s.prioridad==="media"?"selected":""}>media</option><option value="alta" ${s.prioridad==="alta"?"selected":""}>alta</option><option value="critica" ${s.prioridad==="critica"?"selected":""}>crítica</option></select></td><td class="col-estado">${e.texto}</td><td class="col-acciones no-print"><div class="actions"><button title="Añadir subtarea dentro" onclick="addSubtareaDentro('${t.id}','${s.id}')">＋</button><button title="Editar subtarea" onclick="editarSubtarea('${t.id}','${s.id}')">✎</button><button title="Eliminar subtarea" onclick="eliminarSubtarea('${t.id}','${s.id}')">🗑</button></div></td>`;tb.appendChild(sr);renderSubtareas(tb,t,s.subtareas,nivel+1)})}
+function actualizarCampo(id,campo,valor){const t=tareas.find(x=>x.id===id);if(!t)return;const a=t[campo]??"";t[campo]=valor;logAccion("Actualizado "+campo+" en "+t.cod+": "+a+" → "+valor);guardarTareasYRender()}
+function prepararJSON(){const data={version:3,app:"Notas de Tareas",fechaExportacion:new Date().toISOString(),tareas,historial,filtros,ajustes};document.getElementById("jsonBox").value=JSON.stringify(data,null,2)}
+function exportarJSON(){prepararJSON();copiarTexto(document.getElementById("jsonBox").value,"JSON copiado al portapapeles.")}
+function importarJSON(){const raw=document.getElementById("jsonBox").value.trim();if(!raw){alert("Pega primero el JSON en la caja.");return}try{const data=JSON.parse(raw);let nt;if(Array.isArray(data))nt=data;else if(data&&Array.isArray(data.tareas)){nt=data.tareas;if(Array.isArray(data.historial))historial=data.historial;if(data.filtros&&typeof data.filtros==="object")filtros=data.filtros;if(data.ajustes&&typeof data.ajustes==="object")ajustes=data.ajustes}else throw new Error("El JSON no contiene una lista de tareas válida.");if(!confirm("¿Importar estas tareas? Se sustituirán las tareas actuales."))return;tareas=normalizarTareasImportadas(nt);guardarJSONSeguro(STORAGE_TAREAS,tareas);guardarJSONSeguro(STORAGE_HISTORIAL,historial);guardarJSONSeguro(STORAGE_FILTROS,filtros);guardarJSONSeguro(STORAGE_AJUSTES,ajustes);aplicarAjustes();cargarFiltrosEnPantalla();logAccion("Importación JSON realizada.");render();alert("Importación correcta.")}catch(e){alert("JSON no válido: "+e.message)}}
+function normalizarSubtareas(lista){if(!Array.isArray(lista))return[];return lista.map(s=>typeof s==="string"?{id:generarId(),cod:"",texto:s,inicio:"",vence:"",fin:"",prioridad:"media",subtareas:[]}:{id:s.id||generarId(),cod:s.cod||"",texto:String(s.texto||""),inicio:s.inicio||"",vence:s.vence||"",fin:s.fin||"",prioridad:["baja","media","alta","critica"].includes(s.prioridad)?s.prioridad:"media",subtareas:normalizarSubtareas(s.subtareas||s.subs)})}
+function normalizarTareasImportadas(lista){return lista.map((t,i)=>({id:t.id||generarId(),cod:String(t.cod||String(i+1).padStart(4,"0")).slice(-4).padStart(4,"0"),texto:String(t.texto||t.tarea||"Sin texto"),inicio:t.inicio||"",vence:t.vence||"",fin:t.fin||"",prioridad:["baja","media","alta","critica"].includes(t.prioridad)?t.prioridad:"media",subtareas:normalizarSubtareas(t.subtareas||t.subs)}))}
+function exportarExcel(){let txt="INICIO\tVENCE\tFIN\tCOD\tTAREA\tPRIORIDAD\tESTADO\n";function addSubExcel(lista,nivel){(lista||[]).forEach(s=>{txt+=[s.inicio||"",s.vence||"",s.fin||"","",("  ".repeat(nivel))+"└─ "+limpiarTSV(s.texto),s.prioridad||"",getEstado(s).texto].join("\t")+"\n";addSubExcel(s.subtareas,nivel+1)})}tareas.forEach(t=>{txt+=[t.inicio||"",t.vence||"",t.fin||"",t.cod||"",limpiarTSV(t.texto),t.prioridad||"",getEstado(t).texto].join("\t")+"\n";addSubExcel(t.subtareas,1)});copiarTexto(txt,"Tabla copiada para pegar en Excel.")}
+function limpiarTSV(t){return String(t??"").replace(/\t/g," ").replace(/\r?\n/g," ")}
+function copiarTexto(txt,msg){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(()=>alert(msg)).catch(()=>prompt("Copia manualmente:",txt))}else prompt("Copia manualmente:",txt)}
+function abrirPanel(id){document.querySelectorAll(".panel").forEach(p=>p.style.display="none");document.getElementById(id).style.display="block";if(id==="panelJson")prepararJSON()}
+function cerrarPanel(id){document.getElementById(id).style.display="none"}
+function aplicarAjustes(){document.body.className="";document.body.classList.add("mode-"+(ajustes.modo||"2d"));document.body.classList.add("theme-"+(ajustes.tema||"blue"));document.body.classList.add("size-"+(ajustes.escala||"normal"));const m=document.getElementById("ajusteModo"),t=document.getElementById("ajusteTema"),e=document.getElementById("ajusteEscala");if(m)m.value=ajustes.modo||"2d";if(t)t.value=ajustes.tema||"blue";if(e)e.value=ajustes.escala||"normal"}
+function guardarAjustesDesdePanel(){ajustes={modo:document.getElementById("ajusteModo").value,tema:document.getElementById("ajusteTema").value,escala:document.getElementById("ajusteEscala").value};guardarJSONSeguro(STORAGE_AJUSTES,ajustes);aplicarAjustes()}
+function actualizarOffsetCabecera(){const tb=document.querySelector(".topbar");if(tb)document.documentElement.style.setProperty("--sticky-offset",(tb.offsetHeight+8)+"px")}
+function cargarFiltrosEnPantalla(){document.getElementById("textoFiltro").value=filtros.texto||"";document.getElementById("diasFiltro").value=filtros.dias||"";cargarMultiFiltrosEnPantalla();actualizarOffsetCabecera()}
+window.addEventListener("resize",actualizarOffsetCabecera);
+window.addEventListener("load",()=>{if(!Array.isArray(filtros.prioridades))filtros.prioridades=[];if(!Array.isArray(filtros.estados))filtros.estados=[];tareas=normalizarTareasImportadas(tareas);guardarJSONSeguro(STORAGE_TAREAS,tareas);aplicarAjustes();cargarFiltrosEnPantalla();actualizarOffsetCabecera();render()});
 </script>
 </body>
 </html>
